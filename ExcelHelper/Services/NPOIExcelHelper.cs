@@ -206,9 +206,12 @@ namespace ExcelHelper.Services
             errorMessage = string.Empty;
           
             var pType = propInfo.PropertyType;
-
+            bool isNullable = false;
             if (Nullable.GetUnderlyingType(propInfo.PropertyType) != null)
+            {
                 pType = Nullable.GetUnderlyingType(propInfo.PropertyType);
+                isNullable = true;
+            }
             switch (Type.GetTypeCode(pType))
             {
                 case TypeCode.Empty:
@@ -256,7 +259,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -283,7 +290,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -309,7 +320,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -335,7 +350,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -361,7 +380,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -387,7 +410,8 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
                             return 0;
                         case CellType.Formula:
                             break;
@@ -414,7 +438,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -440,7 +468,11 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                            {
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                             return 0;
                         case CellType.Formula:
                             break;
@@ -466,7 +498,8 @@ namespace ExcelHelper.Services
                             {
                                 return val;
                             }
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            if (!isNullable)
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
                             return 0;
                         case CellType.Formula:
                             break;
@@ -497,8 +530,9 @@ namespace ExcelHelper.Services
                         case CellType.String:
                             if (DateTime.TryParse(cell.StringCellValue, out DateTime dt))
                                 return dt;
-                            errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
-                            return new DateTime();
+                            if (!isNullable)
+                                errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                            return null;
                         default:
                             break;
                     }
