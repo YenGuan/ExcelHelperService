@@ -28,7 +28,7 @@ namespace ExcelHelper.Services
             IRow headerRow = sheet.GetRow(0);
             var props = typeof(T).GetProperties();
             var headerNames = props.Select(x => x.GetCustomAttribute<DisplayAttribute>() == null ? x.Name : x.GetCustomAttribute<DisplayAttribute>().Name).ToList();//OrderBy(o => o.Order)
-           
+
             var propInfos = new List<PropertyInfo>();
             var propNames = new List<string>();
 
@@ -49,7 +49,7 @@ namespace ExcelHelper.Services
             {
                 var propInfo = props.FirstOrDefault(x => x.GetCustomAttribute<DisplayAttribute>()?.Name == headerRow.GetCell(i).StringCellValue);
                 if (propInfo == null)
-                    propInfo = props.FirstOrDefault(x => x.Name == headerRow.GetCell(i).StringCellValue);              
+                    propInfo = props.FirstOrDefault(x => x.Name == headerRow.GetCell(i).StringCellValue);
                 var displayInfo = (DisplayFormatAttribute)propInfo.GetCustomAttributes(typeof(DisplayFormatAttribute), true).FirstOrDefault();
                 propInfos.Add(propInfo);
 
@@ -65,7 +65,7 @@ namespace ExcelHelper.Services
                 StringBuilder rowErrorStrBuilder = new StringBuilder();
                 IRow row = sheet.GetRow(i);
                 T instance = (T)Activator.CreateInstance(typeof(T));
-             
+
                 for (int j = 0; j < row.LastCellNum; j++)
                 {
                     if (row.GetCell(j) == null)
@@ -78,7 +78,7 @@ namespace ExcelHelper.Services
                         rowErrorStrBuilder.Append(cellTypeErrorMessage);
                     }
                 }
-            
+
                 var context = new ValidationContext(instance, serviceProvider: null, items: null);
                 var results = new List<ValidationResult>();
                 var isValid = Validator.TryValidateObject(instance, context, results);
@@ -201,10 +201,10 @@ namespace ExcelHelper.Services
             return excelDatas;
         }
 
-        private object GetCellValueByPropertyTypeCode(ICell cell, PropertyInfo propInfo,string propName, out string errorMessage)
+        private object GetCellValueByPropertyTypeCode(ICell cell, PropertyInfo propInfo, string propName, out string errorMessage)
         {
             errorMessage = string.Empty;
-          
+
             var pType = propInfo.PropertyType;
             bool isNullable = false;
             if (Nullable.GetUnderlyingType(propInfo.PropertyType) != null)
@@ -325,7 +325,7 @@ namespace ExcelHelper.Services
                                 errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
                                 return null;
                             }
-                            return 0;
+                            return null;
                         case CellType.Formula:
                             break;
                         case CellType.Blank:
@@ -471,9 +471,10 @@ namespace ExcelHelper.Services
                             if (!isNullable)
                             {
                                 errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
-                                return null;
+                                double d = 0;
+                                return d;
                             }
-                            return 0;
+                            return null;
                         case CellType.Formula:
                             break;
                         case CellType.Blank:
@@ -499,8 +500,11 @@ namespace ExcelHelper.Services
                                 return val;
                             }
                             if (!isNullable)
+                            {
                                 errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
-                            return 0;
+                                return new decimal(0);
+                            }
+                            return null;
                         case CellType.Formula:
                             break;
                         case CellType.Blank:
@@ -527,11 +531,23 @@ namespace ExcelHelper.Services
                             {
                                 return DateTime.FromOADate(cell.NumericCellValue);
                             }
+                            catch (ArgumentOutOfRangeException)
+                            {
+                                if (DateTime.TryParseExact(cell.NumericCellValue.ToString(), "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime dateTime))
+                                {
+                                    return dateTime;
+                                }
+                                errorMessage = $"'{cell.NumericCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return null;
+                            }
                         case CellType.String:
                             if (DateTime.TryParse(cell.StringCellValue, out DateTime dt))
                                 return dt;
                             if (!isNullable)
+                            {
                                 errorMessage = $"'{cell.StringCellValue}' is not a valid value for type:{Type.GetTypeCode(pType)}";
+                                return new DateTime();
+                            }
                             return null;
                         default:
                             break;

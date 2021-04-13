@@ -3,8 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
-    <Description>1.0.1 fix issue when import empty value to a nullable type still counting as an error</Description>
+    <Version>1.0.2</Version>
+    <Description>1.0.1 fix issue when import empty value to a nullable type still counting as an error
+1.0.2 fix nullable decimal/double converting bug</Description>
   </PropertyGroup>
 	<ItemGroup>
 		 
